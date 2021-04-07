@@ -1,0 +1,2 @@
+# SlideCardDemo
+一个展示仿探探左右滑动添加关注效果的demo，自定义了RecyclerView的LayoutManager和ItemTouchHelper
