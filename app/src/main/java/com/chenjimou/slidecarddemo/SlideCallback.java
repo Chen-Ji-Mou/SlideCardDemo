@@ -31,12 +31,12 @@ public class SlideCallback extends ItemTouchHelper.SimpleCallback {
         return false;
     }
 
-    // item 被滑动的回调
+    // item 被滑动后的回调
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-        // 删除数据中的最后一个
+        // 删除 adapter 数据集中的最后一个
         String removeUrl = data.remove(viewHolder.getLayoutPosition());
-        // 将数据中的最后一个再添加到数据中第一个
+        // 将删除的数据再添加到 adapter 数据集中的第一个
         data.add(0, removeUrl);
         adapter.notifyDataSetChanged();
     }
@@ -47,28 +47,28 @@ public class SlideCallback extends ItemTouchHelper.SimpleCallback {
                             @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
                             int actionState, boolean isCurrentlyActive) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-
+        // 判断 item 是否属于滑出屏幕的最大距离
         double maxDistance = recyclerView.getWidth() * 0.5f;
+        // item 移动的距离
         double distance = Math.sqrt(dX * dX + dY * dY);
+        // item 移动距离与临界值的比率。如果比率大于等于1，则表示 item 滑出屏幕
         double fraction = distance / maxDistance;
-
         if (fraction > 1) {
             fraction = 1;
         }
-
-        // 显示的个数  4个
+        // 屏幕中 item 的个数
         int itemCount = recyclerView.getChildCount();
-
+        // 遍历，从被压在最下面 item 开始设置
         for (int i = 0; i < itemCount; i++) {
             View view = recyclerView.getChildAt(i);
-
-            int level = itemCount - i - 1;
-
-            if (level > 0) {
-                if (level < CardConfig.MAX_SHOW_COUNT - 1) {
-                    view.setTranslationY((float) (CardConfig.TRANS_Y_GAP * level - fraction * CardConfig.TRANS_Y_GAP));
-                    view.setScaleX((float) (1 - CardConfig.SCALE_GAP * level + fraction * CardConfig.SCALE_GAP));
-                    view.setScaleY((float) (1 - CardConfig.SCALE_GAP * level + fraction * CardConfig.SCALE_GAP));
+            int zoomDegree = itemCount - i - 1;
+            // 如果 zoomDegree 等于0就代表不进行缩放
+            if (zoomDegree != 0) {
+                // 如果遍历到的不是被压在最下面的 View
+                if (zoomDegree != CardConfig.MAX_SHOW_COUNT - 1) {
+                    view.setTranslationY((float) (CardConfig.TRANS_Y_GAP * zoomDegree - fraction * CardConfig.TRANS_Y_GAP));
+                    view.setScaleX((float) (1 - CardConfig.SCALE_GAP * zoomDegree + fraction * CardConfig.SCALE_GAP));
+                    view.setScaleY((float) (1 - CardConfig.SCALE_GAP * zoomDegree + fraction * CardConfig.SCALE_GAP));
                 }
             }
         }

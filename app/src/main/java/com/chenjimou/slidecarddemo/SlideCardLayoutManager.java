@@ -18,7 +18,7 @@ public class SlideCardLayoutManager extends RecyclerView.LayoutManager {
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         // ViewHolder 回收
         detachAndScrapAttachedViews(recycler);
-        // 被压在最下面的 View 的 position
+        // 被压在最下面的 item 的 position
         int bottomPosition;
         int itemCount = getItemCount();
         if (itemCount < CardConfig.MAX_SHOW_COUNT) {
@@ -27,6 +27,7 @@ public class SlideCardLayoutManager extends RecyclerView.LayoutManager {
             // 屏幕上永远只显示四个 item
             bottomPosition = itemCount - CardConfig.MAX_SHOW_COUNT;
         }
+        // 遍历，从被压在最下面 item 开始设置
         for (int i = bottomPosition; i < itemCount; i++) {
             // ViewHolder 复用
             View view = recycler.getViewForPosition(i);
@@ -44,8 +45,10 @@ public class SlideCardLayoutManager extends RecyclerView.LayoutManager {
                     surplusVertical / 2 + getDecoratedMeasuredHeight(view));
             // 设置 View 大小的缩放，使 View 叠加得有层次感
             int zoomDegree = itemCount - i - 1;
-            if (zoomDegree > 0){
-                if (zoomDegree < CardConfig.MAX_SHOW_COUNT - 1) {
+            // 如果 zoomDegree 等于0就代表不进行缩放
+            if (zoomDegree != 0){
+                // 如果遍历到的不是被压在最下面的 View
+                if (zoomDegree != CardConfig.MAX_SHOW_COUNT - 1) {
                     // 设置 View 在水平方向的偏移量，以像素为单位。会引发 View 重绘
                     // 偏移量为正数时，表示 View 向下平移；反之表示向上平移
                     view.setTranslationY(CardConfig.TRANS_Y_GAP * zoomDegree);
